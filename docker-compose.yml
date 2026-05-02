@@ -1,0 +1,71 @@
+# One-command boot of the full stack:
+#   docker compose up --build
+#
+# Services:
+#   ollama  - local LLM server. Pulls qwen3:8b on first start.
+#   api     - FastAPI + scoring pipeline.
+#   ui      - Streamlit UI talking to the API.
+#
+# To use a different open-weights model edit `OLLAMA_MODEL` in `.env`
+# (must be ≤16B, e.g. llama3.1:8b-instruct, qwen3:8b,
+# mistral-nemo:12b-instruct).
+
+services:
+  ollama:
+    image: ollama/ollama:latest
+    container_name: oae-ollama
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama_models:/root/.ollama
+    healthcheck:
+      test: ["CMD-SHELL", "ollama list >/dev/null 2>&1 || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+    restart: unless-stopped
+
+  ollama-pull:
+    # One-shot helper that pulls the model on first boot, then exits.
+    image: ollama/ollama:latest
+    depends_on:
+      ollama:
+        condition: service_healthy
+    entrypoint: ["/bin/sh", "-c"]
+    command: ["OLLAMA_HOST=http://ollama:11434 ollama pull ${OLLAMA_MODEL:-qwen3:8b}"]
+    restart: "no"
+
+  api:
+    build:
+      context: .
+      target: api
+    container_name: oae-api
+    environment:
+      LLM_BACKEND: ollama
+      OLLAMA_HOST: http://ollama:11434
+      OLLAMA_MODEL: ${OLLAMA_MODEL:-qwen3:8b}
+      EMBED_MODEL: ${EMBED_MODEL:-sentence-transformers/all-MiniLM-L6-v2}
+      RETRIEVE_TOP_K: ${RETRIEVE_TOP_K:-40}
+      PARALLEL_SCORERS: ${PARALLEL_SCORERS:-8}
+    ports:
+      - "8080:8080"
+    depends_on:
+      ollama:
+        condition: service_healthy
+    restart: unless-stopped
+
+  ui:
+    build:
+      context: .
+      target: ui
+    container_name: oae-ui
+    environment:
+      API_URL: http://api:8080
+    ports:
+      - "8501:8501"
+    depends_on:
+      - api
+    restart: unless-stopped
+
+volumes:
+  ollama_models:

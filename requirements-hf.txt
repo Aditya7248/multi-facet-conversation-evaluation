@@ -1,0 +1,6 @@
+# Optional: required only when running the HFClient backend (transformers in-process).
+# Skip when targeting Ollama or vLLM.
+-r requirements.txt
+transformers>=4.40
+torch>=2.2
+accelerate>=0.30

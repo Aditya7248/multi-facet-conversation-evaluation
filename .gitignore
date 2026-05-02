@@ -1,0 +1,46 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+.eggs/
+build/
+dist/
+.venv/
+venv/
+env/
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.coverage
+coverage.xml
+htmlcov/
+
+# Models / large artifacts
+*.bin
+*.safetensors
+*.gguf
+data/index/*.faiss
+data/index/*.npy
+!data/index/.gitkeep
+
+# IDE
+.idea/
+.vscode/
+*.swp
+.DS_Store
+
+# Env
+.env
+.env.local
+
+# Outputs
+outputs/
+runs/
+wandb/
+mlruns/
+*.log
+
+# Generated examples ZIP (regenerate via `make examples-zip`)
+examples/conversations_scored.zip
+examples/generated/

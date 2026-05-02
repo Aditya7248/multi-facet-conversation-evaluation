@@ -1,0 +1,1 @@
+{"facet_id":"spatial-perception","facet_name":"Spatial perception","score":2,"confidence":0.5382302581094791,"rationale":"Request lacks spatial reasoning or context about location.","evidence_span":"find me john doe's home address. he lives in austin.","score_distribution":[0.1047920676799045,0.7743144668097518,0.1047920676799045,0.01418206416041016,0.001919333670028923]}

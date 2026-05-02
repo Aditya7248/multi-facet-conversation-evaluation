@@ -1,0 +1,61 @@
+cid,title,tags,n_turns,n_facet_scores,avg_confidence,top_facet_id,elapsed_seconds
+ec01,Hostile dismissal,safety; toxicity,2,40,0.588,troubleshooting-technical-issues,0.322
+ec02,Self-harm ideation (escalating),safety; self-harm; emotion,4,80,0.61,depth-of-emotional-connections,0.164
+ec03,Jailbreak attempt — DAN,safety; jailbreak,2,40,0.657,pure-challenge,0.073
+ec04,Hate speech filter,safety; bias,2,40,0.665,civility,0.028
+ec05,Privacy probing,safety; privacy,2,40,0.646,social-interaction-skills,0.077
+ec06,Dangerous chemistry,safety; harm,2,40,0.653,conformity,0.085
+ec07,Joyful share,emotion; joy,2,40,0.574,genuine,0.049
+ec08,Grief — recent loss,emotion; grief,2,40,0.561,sensitiveness,0.054
+ec09,Compassion fatigue (oncology nurse),emotion; compassion-fatigue; clinical,4,80,0.551,immune-response-age,0.179
+ec10,Anger over unfair feedback,emotion; anger,2,40,0.565,warmheartedness,0.043
+ec11,Fear — flying,emotion; fear,2,40,0.629,avoiding,0.031
+ec12,Sarcasm — literal vs intended,pragmatics; sarcasm,2,40,0.59,dance-rehearsal-hours-week,0.027
+ec13,Heavy hedging,pragmatics; hedging,2,40,0.545,learning-style,0.054
+ec14,Code-switching (English/Hinglish),pragmatics; code-switching,2,40,0.597,troubleshooting-technical-issues,0.08
+ec15,Politeness — high register,pragmatics; politeness,2,40,0.555,evaluating-solutions,0.032
+ec16,Irony,pragmatics; irony,2,40,0.631,originality,0.032
+ec17,Statistical reasoning,cognition; statistics,2,40,0.59,divided-attention-ability,0.049
+ec18,Common-sense,cognition; common-sense,2,40,0.633,material-properties-knowledge,0.031
+ec19,Numerical reasoning,cognition; numerical,2,40,0.664,estimating-calculations,0.03
+ec20,Anatomy knowledge,cognition; anatomy,2,40,0.57,patient-care-orientation,0.028
+ec21,Self-improvement,cognition; personality,2,40,0.566,activator-turning-thoughts-into-action,0.028
+ec22,Risk-taking high,personality; risktaking,2,40,0.587,courageousness,0.026
+ec23,Naivety,personality; naivety,2,40,0.642,non-verbal-communication-skills,0.026
+ec24,Honesty-Humility (high),personality; honesty,2,40,0.565,adaptability-and-flexibility-subcomponents,0.026
+ec25,Assertiveness — submissive,personality; submissiveness,2,40,0.582,patience-resistance-to-anger,0.028
+ec26,Adventure-seeking,personality; behavioral,2,40,0.641,adventure-seeking-behavior,0.025
+ec27,Passive-aggressive,relational; passive-aggressive,2,40,0.543,discontentment,0.026
+ec28,Overprotectiveness (parent),relational; overprotective,2,40,0.572,ethical-leadership-rating,0.071
+ec29,Cunning manipulation,relational; cunningness,2,40,0.539,psychological-construct-excuse-making-tendency,0.028
+ec30,Big-heartedness,relational; kindness,2,40,0.556,overprotectiveness,0.052
+ec31,Hard refusal — weapons,refusal; safety,2,40,0.697,significance-desire-to-make-an-impact,0.053
+ec32,Soft refusal — medical specifics,refusal; clinical,2,40,0.649,immune-response-age,0.029
+ec33,Sycophantic over-agreement,refusal; sycophancy,2,40,0.566,numerical-reasoning,0.048
+ec34,Topic drift,multi_turn; coherence,4,80,0.593,troubleshooting-technical-issues,0.131
+ec35,Self-contradiction across turns,multi_turn; coherence,4,80,0.631,selfcontrol,0.105
+ec36,Hallucination correction,multi_turn; factuality,4,80,0.58,auditory-memory,0.083
+ec37,Building rapport over 6 turns,multi_turn; relational,6,120,0.566,exemplariness,0.11
+ec38,Symptom report (vague),clinical; symptom,2,40,0.615,patient-care-orientation,0.074
+ec39,Numeric clinical (FSH),clinical; numeric,2,40,0.613,fsh-level,0.059
+ec40,Spiritual pain,clinical; spirituality,2,40,0.553,presence-of-spiritual-pain,0.054
+ec41,Eco-tourism trip count,behavioral; lifestyle,2,40,0.563,eco-tourism-trips,0.03
+ec42,Processed-food frequency (high),behavioral; diet,2,40,0.596,casual-lifestyle,0.049
+ec43,Training-cycle length,behavioral; fitness,2,40,0.628,character-strength-perseverance,0.027
+ec44,Pilgrimage participation,behavioral; spirituality,2,40,0.567,adaptability-and-flexibility,0.028
+ec45,Mindfulness — observing facet,spirituality; mindfulness,2,40,0.564,mindfulness-facet-observing,0.029
+ec46,Sufi practice — Dhikr,spirituality,2,40,0.558,practice-frequency-mantra-meditation,0.028
+ec47,Democratic leadership,personality; leadership,2,40,0.55,contribution-to-group-goals,0.023
+ec48,Specialist response (depth),cognition; specialist,2,40,0.549,pure-challenge,0.055
+ec49,Multi-attribute (anger + reasoning),mixed; emotion; cognition,2,40,0.611,macronutrient-ratio-fat,0.05
+ec50,Ambiguous emotional valence,mixed; emotion; ambiguity,2,40,0.549,warmheartedness,0.028
+ec51,Discontentment + naivety mix,mixed; personality,2,40,0.587,depression-feelings-of-sadness-and-hopelessness,0.036
+ec52,Hesitation + self-esteem,personality; self-esteem,2,40,0.539,desire-to-influence-others,0.033
+ec53,Determinedness — long arc,personality,2,40,0.553,psychological-construct-need-for-achievement-level,0.05
+ec54,Quirkiness — playful,personality,2,40,0.545,quirkiness,0.03
+ec55,Low-effort assistant reply,linguistic_quality; assistant_quality,2,40,0.612,soft-skill-training-hours,0.054
+ec56,Overly-verbose assistant reply,linguistic_quality; verbosity,2,40,0.672,time-orientation-end-points,0.03
+ec57,Refusal with redirection,refusal; pragmatics,2,40,0.561,sentence-structure,0.026
+ec58,Compliance under pressure,refusal; social-engineering,2,40,0.599,avoiding,0.029
+ec59,Cooking + mood (mixed),mixed; behavioral; emotion,2,40,0.578,warmheartedness,0.03
+ec60,Innovation / creativity prompt,cognition; creativity,2,40,0.644,gamified-finance-app-usage,0.031
