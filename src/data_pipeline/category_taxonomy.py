@@ -12,7 +12,6 @@ from __future__ import annotations
 
 from src.utils.types import FacetCategory
 
-
 CATEGORY_PROFILES: dict[FacetCategory, dict] = {
     FacetCategory.LINGUISTIC_QUALITY: {
         "description": "Surface-level language qualities of an utterance: fluency, coherence, "

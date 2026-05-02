@@ -44,7 +44,7 @@ import os
 import re
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
-from typing import Any, Optional
+from typing import Any
 
 import httpx
 from tenacity import retry, stop_after_attempt, wait_exponential
@@ -67,7 +67,7 @@ class ScoreResult:
     score_distribution: list[float]
     confidence: float
     rationale: str = ""
-    evidence_span: Optional[str] = None
+    evidence_span: str | None = None
     raw: dict = field(default_factory=dict)
 
 
@@ -192,9 +192,9 @@ def build_user_prompt(
 def normalised_entropy_confidence(p: list[float]) -> float:
     """Confidence in [0, 1]: 1 = peaked, 0 = uniform."""
     eps = 1e-12
-    H = -sum(pi * math.log(pi + eps) for pi in p)
-    Hmax = math.log(len(p))
-    return max(0.0, min(1.0, 1.0 - H / Hmax))
+    entropy = -sum(pi * math.log(pi + eps) for pi in p)
+    max_entropy = math.log(len(p))
+    return max(0.0, min(1.0, 1.0 - entropy / max_entropy))
 
 
 def _softmax(xs: list[float]) -> list[float]:
@@ -609,7 +609,7 @@ def _ordinal_pseudodist(score: int, sharpness: float = 2.0) -> list[float]:
     return _softmax(raw)
 
 
-def _extract_score_distribution_from_logprobs(logprobs_payload: Any) -> Optional[list[float]]:
+def _extract_score_distribution_from_logprobs(logprobs_payload: Any) -> list[float] | None:
     """vLLM returns OpenAI-style logprobs. We hunt for the first generated
     token whose top-5 contains a digit 1..5 and softmax over those.
 
@@ -646,7 +646,7 @@ def build_default_client(prefer_real: bool = True) -> LLMClient:
     cfg = load_config()
     backend = cfg["llm"]["backend"].lower()
 
-    candidate: Optional[LLMClient] = None
+    candidate: LLMClient | None = None
     try:
         if backend == "ollama":
             candidate = OllamaClient(

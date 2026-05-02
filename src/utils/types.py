@@ -9,10 +9,8 @@ against these classes.
 from __future__ import annotations
 
 from enum import Enum
-from typing import Optional
 
 from pydantic import BaseModel, Field, field_validator
-
 
 # ---------------------------------------------------------------------------
 # Facet domain model
@@ -58,7 +56,7 @@ class RubricLevel(BaseModel):
     level: int = Field(..., ge=1, le=5)
     label: str
     description: str
-    exemplar: Optional[str] = None
+    exemplar: str | None = None
 
 
 class FacetDefinition(BaseModel):
@@ -121,7 +119,7 @@ class ConversationTurn(BaseModel):
 
 class Conversation(BaseModel):
     conversation_id: str
-    title: Optional[str] = None
+    title: str | None = None
     tags: list[str] = Field(default_factory=list, description="e.g. ['toxic', 'sarcasm']")
     turns: list[ConversationTurn]
     metadata: dict = Field(default_factory=dict)
@@ -140,15 +138,15 @@ class FacetScore(BaseModel):
     score: int = Field(..., ge=1, le=5)
     confidence: float = Field(..., ge=0.0, le=1.0, description="0..1, calibrated")
     rationale: str = ""
-    evidence_span: Optional[str] = None
-    score_distribution: Optional[list[float]] = Field(
+    evidence_span: str | None = None
+    score_distribution: list[float] | None = Field(
         default=None,
         description="Softmax probability over the 5 ordinal classes (sums to 1).",
     )
 
     @field_validator("score_distribution")
     @classmethod
-    def _check_dist(cls, v: Optional[list[float]]) -> Optional[list[float]]:
+    def _check_dist(cls, v: list[float] | None) -> list[float] | None:
         if v is None:
             return v
         if len(v) != 5:
@@ -166,14 +164,14 @@ class TurnScores(BaseModel):
     text: str
     retrieved_facet_ids: list[str] = Field(default_factory=list)
     scores: list[FacetScore] = Field(default_factory=list)
-    latency_ms: Optional[float] = None
+    latency_ms: float | None = None
 
 
 class ConversationScores(BaseModel):
     """The top-level scoring artefact written to disk for each conversation."""
 
     conversation_id: str
-    title: Optional[str] = None
+    title: str | None = None
     tags: list[str] = Field(default_factory=list)
     turn_scores: list[TurnScores]
     summary: dict = Field(default_factory=dict)

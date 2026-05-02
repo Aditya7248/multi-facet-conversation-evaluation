@@ -5,7 +5,6 @@ from __future__ import annotations
 import re
 import unicodedata
 
-
 _CAMEL_RE = re.compile(r"(?<=[a-z])(?=[A-Z])")
 _NUMBERED_PREFIX_RE = re.compile(r"^\s*\d+\s*[\.\):\-]\s*")
 _MULTI_WS_RE = re.compile(r"\s+")

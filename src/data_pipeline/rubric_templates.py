@@ -26,7 +26,6 @@ from __future__ import annotations
 
 from src.utils.types import FacetCategory, RubricLevel, ScoreDirection
 
-
 # Generic positive-direction templates. The "{facet}" token gets replaced
 # with the facet name in lowercase.
 _GENERIC_POSITIVE = {

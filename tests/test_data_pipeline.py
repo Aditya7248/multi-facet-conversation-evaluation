@@ -11,7 +11,6 @@ from src.data_pipeline.clean import clean_facets
 from src.data_pipeline.enrich import enrich
 from src.utils.types import FacetCategory, FacetDefinition
 
-
 # ---------------------------------------------------------------------------
 # Cleaning
 # ---------------------------------------------------------------------------

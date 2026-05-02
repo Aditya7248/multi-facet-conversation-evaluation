@@ -20,7 +20,6 @@ from __future__ import annotations
 import json
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Optional
 
 import numpy as np
 
@@ -83,7 +82,7 @@ class FacetRetriever:
         self,
         turn_text: str,
         top_k: int = 40,
-        category: Optional[FacetCategory] = None,
+        category: FacetCategory | None = None,
         min_score: float = 0.0,
     ) -> list[RetrievedFacet]:
         if not turn_text.strip():

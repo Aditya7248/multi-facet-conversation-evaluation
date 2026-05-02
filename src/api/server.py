@@ -16,7 +16,6 @@ startup and reused across requests via FastAPI's dependency-injection.
 from __future__ import annotations
 
 from functools import lru_cache
-from typing import Optional
 
 from fastapi import Depends, FastAPI, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
@@ -60,6 +59,13 @@ def get_pipeline() -> ScoringPipeline:
     return ScoringPipeline.default()
 
 
+# Module-level dependency singleton — FastAPI's `Depends(get_pipeline)` cannot
+# live in a default-argument expression directly (ruff B008), so we evaluate
+# it once at import time and reuse the resulting `Depends` object across
+# every route handler that needs the shared pipeline.
+PipelineDep = Depends(get_pipeline)
+
+
 # ---------------------------------------------------------------------------
 # Request / response models
 # ---------------------------------------------------------------------------
@@ -67,22 +73,22 @@ def get_pipeline() -> ScoringPipeline:
 
 class ScoreRequest(BaseModel):
     conversation: Conversation
-    top_k: Optional[int] = Field(default=None, ge=1, le=400)
-    category: Optional[FacetCategory] = None
+    top_k: int | None = Field(default=None, ge=1, le=400)
+    category: FacetCategory | None = None
 
 
 class TurnScoreRequest(BaseModel):
     text: str
     speaker: Speaker = Speaker.USER
     context: list[ConversationTurn] = Field(default_factory=list)
-    top_k: Optional[int] = Field(default=None, ge=1, le=400)
-    category: Optional[FacetCategory] = None
+    top_k: int | None = Field(default=None, ge=1, le=400)
+    category: FacetCategory | None = None
 
 
 class RetrieveRequest(BaseModel):
     text: str
     top_k: int = 40
-    category: Optional[FacetCategory] = None
+    category: FacetCategory | None = None
     min_score: float = 0.0
 
 
@@ -100,7 +106,7 @@ class RetrievedFacetOut(BaseModel):
 
 
 @app.get("/health")
-def health(pipe: ScoringPipeline = Depends(get_pipeline)) -> dict:
+def health(pipe: ScoringPipeline = PipelineDep) -> dict:
     cfg = load_config()
     return {
         "status": "ok",
@@ -118,8 +124,8 @@ def health(pipe: ScoringPipeline = Depends(get_pipeline)) -> dict:
 
 @app.get("/facets")
 def list_facets(
-    pipe: ScoringPipeline = Depends(get_pipeline),
-    category: Optional[FacetCategory] = None,
+    pipe: ScoringPipeline = PipelineDep,
+    category: FacetCategory | None = None,
     page: int = Query(1, ge=1),
     page_size: int = Query(50, ge=1, le=500),
 ) -> dict:
@@ -138,7 +144,7 @@ def list_facets(
 
 
 @app.get("/facets/{facet_id}")
-def get_facet(facet_id: str, pipe: ScoringPipeline = Depends(get_pipeline)) -> FacetDefinition:
+def get_facet(facet_id: str, pipe: ScoringPipeline = PipelineDep) -> FacetDefinition:
     try:
         return pipe.retriever.by_id(facet_id)
     except KeyError as e:
@@ -146,7 +152,7 @@ def get_facet(facet_id: str, pipe: ScoringPipeline = Depends(get_pipeline)) -> F
 
 
 @app.post("/retrieve", response_model=list[RetrievedFacetOut])
-def retrieve(req: RetrieveRequest, pipe: ScoringPipeline = Depends(get_pipeline)):
+def retrieve(req: RetrieveRequest, pipe: ScoringPipeline = PipelineDep):
     hits = pipe.retriever.retrieve(
         req.text, top_k=req.top_k, category=req.category, min_score=req.min_score
     )
@@ -163,7 +169,7 @@ def retrieve(req: RetrieveRequest, pipe: ScoringPipeline = Depends(get_pipeline)
 
 
 @app.post("/score", response_model=ConversationScores)
-def score_conversation(req: ScoreRequest, pipe: ScoringPipeline = Depends(get_pipeline)):
+def score_conversation(req: ScoreRequest, pipe: ScoringPipeline = PipelineDep):
     if req.category is not None:
         # Temporarily override the pipeline category filter for this call.
         pipe.category_filter = req.category
@@ -174,7 +180,7 @@ def score_conversation(req: ScoreRequest, pipe: ScoringPipeline = Depends(get_pi
 
 
 @app.post("/score/turn")
-def score_single_turn(req: TurnScoreRequest, pipe: ScoringPipeline = Depends(get_pipeline)):
+def score_single_turn(req: TurnScoreRequest, pipe: ScoringPipeline = PipelineDep):
     """Convenience endpoint: score one turn without wrapping it in a Conversation."""
     turns = list(req.context) + [
         ConversationTurn(turn_index=len(req.context), speaker=req.speaker, text=req.text),

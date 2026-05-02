@@ -15,7 +15,6 @@ from __future__ import annotations
 
 import time
 from pathlib import Path
-from typing import Optional
 
 from src.models.llm_client import LLMClient, build_default_client
 from src.scoring.retriever import FacetRetriever, build_default_retriever
@@ -26,7 +25,6 @@ from src.utils.types import (
     Conversation,
     ConversationScores,
     FacetCategory,
-    Speaker,
     TurnScores,
 )
 
@@ -40,8 +38,8 @@ class ScoringPipeline:
         client: LLMClient,
         top_k: int = 40,
         parallel_workers: int = 8,
-        cache: Optional[ScoreCache] = None,
-        category_filter: Optional[FacetCategory] = None,
+        cache: ScoreCache | None = None,
+        category_filter: FacetCategory | None = None,
         min_retrieval_score: float = 0.0,
     ):
         self.retriever = retriever
@@ -55,11 +53,11 @@ class ScoringPipeline:
     # ---- Constructors -------------------------------------------------
 
     @classmethod
-    def default(cls) -> "ScoringPipeline":
+    def default(cls) -> ScoringPipeline:
         cfg = load_config()
         retriever = build_default_retriever()
         client = build_default_client()
-        cache: Optional[ScoreCache] = None
+        cache: ScoreCache | None = None
         if cfg["scoring"].get("cache_enabled", True):
             cache = ScoreCache(
                 cache_dir=Path(cfg["repo_root"]) / cfg["scoring"]["cache_dir"]
@@ -79,7 +77,7 @@ class ScoringPipeline:
     # ---- Public API ----------------------------------------------------
 
     def score_conversation(
-        self, conversation: Conversation, top_k: Optional[int] = None
+        self, conversation: Conversation, top_k: int | None = None
     ) -> ConversationScores:
         k = top_k or self.top_k
         log.info(

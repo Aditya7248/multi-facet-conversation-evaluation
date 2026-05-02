@@ -38,7 +38,6 @@ from __future__ import annotations
 import argparse
 import json
 from pathlib import Path
-from typing import Optional
 
 import numpy as np
 import pandas as pd
@@ -74,7 +73,7 @@ def _embed(model, texts: list[str]) -> np.ndarray:
     return model.encode(texts)
 
 
-def _keyword_match(name: str) -> Optional[FacetCategory]:
+def _keyword_match(name: str) -> FacetCategory | None:
     """High-precision keyword fast-path. Returns None if no match."""
     n = name.lower()
     for cat, profile in CATEGORY_PROFILES.items():

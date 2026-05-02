@@ -21,7 +21,6 @@ import hashlib
 import json
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Optional
 
 import numpy as np
 
@@ -152,7 +151,7 @@ class VectorIndex:
         return out
 
     @classmethod
-    def load(cls, vectors_path: Path) -> "VectorIndex":
+    def load(cls, vectors_path: Path) -> VectorIndex:
         vecs = np.load(vectors_path)
         return cls(vecs)
 
@@ -177,14 +176,24 @@ def build_index(vectors: np.ndarray, prefer_faiss: bool = True):
 
 
 def faiss_search(index, query: np.ndarray, top_k: int) -> list[list[SearchHit]]:
-    """Uniform search() across faiss and the numpy fallback."""
+    """Uniform search() across faiss and the numpy fallback.
+
+    FAISS returns two parallel arrays — distances and integer row indices —
+    which we shape into per-query lists of `SearchHit`. The local names use
+    the descriptive `distances` / `indices` rather than FAISS's terse
+    `D, I` to keep ruff (E741, N806) and reviewers happy.
+    """
     if isinstance(index, VectorIndex):
         return index.search(query, top_k)
     if query.ndim == 1:
         query = query[None, :]
-    D, I = index.search(query.astype(np.float32), top_k)
+    distances, indices = index.search(query.astype(np.float32), top_k)
     return [
-        [SearchHit(int(I[b, k]), float(D[b, k])) for k in range(I.shape[1]) if I[b, k] != -1]
+        [
+            SearchHit(int(indices[b, k]), float(distances[b, k]))
+            for k in range(indices.shape[1])
+            if indices[b, k] != -1
+        ]
         for b in range(query.shape[0])
     ]
 

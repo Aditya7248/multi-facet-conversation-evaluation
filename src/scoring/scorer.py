@@ -14,14 +14,20 @@ ordering / batching / caching policy.
 from __future__ import annotations
 
 import hashlib
-import json
 import time
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from pathlib import Path
-from typing import Optional
 
-from src.models.llm_client import LLMClient, ScoreResult, _SYSTEM_PROMPT, _USER_TEMPLATE
+from src.models.llm_client import _SYSTEM_PROMPT, _USER_TEMPLATE, LLMClient, ScoreResult
 from src.utils.logging import get_logger
+from src.utils.types import (
+    ConversationTurn,
+    FacetDefinition,
+    FacetScore,
+    TurnScores,
+)
+
+log = get_logger(__name__)
 
 
 def _current_prompt_version() -> str:
@@ -35,15 +41,6 @@ def _current_prompt_version() -> str:
     h.update(_SYSTEM_PROMPT.encode("utf-8"))
     h.update(_USER_TEMPLATE.encode("utf-8"))
     return h.hexdigest()[:12]
-from src.utils.types import (
-    ConversationTurn,
-    FacetDefinition,
-    FacetScore,
-    Speaker,
-    TurnScores,
-)
-
-log = get_logger(__name__)
 
 
 # ---------------------------------------------------------------------------
@@ -56,7 +53,7 @@ def _score_one(
     facet: FacetDefinition,
     turn: ConversationTurn,
     context: list[ConversationTurn],
-    cache: Optional["ScoreCache"] = None,
+    cache: ScoreCache | None = None,
     temperature: float = 0.0,
 ) -> FacetScore:
     if cache is not None:
@@ -97,7 +94,7 @@ def score_turn(
     turn: ConversationTurn,
     context: list[ConversationTurn],
     parallel_workers: int = 8,
-    cache: Optional["ScoreCache"] = None,
+    cache: ScoreCache | None = None,
 ) -> TurnScores:
     started = time.perf_counter()
     scores: list[FacetScore] = [None] * len(facets)  # type: ignore
@@ -140,7 +137,7 @@ class ScoreCache:
     the 50-conv suite. Disable in config.
     """
 
-    def __init__(self, cache_dir: Path, model_tag: str, prompt_version: Optional[str] = None):
+    def __init__(self, cache_dir: Path, model_tag: str, prompt_version: str | None = None):
         self.cache_dir = Path(cache_dir)
         self.cache_dir.mkdir(parents=True, exist_ok=True)
         self.model_tag = model_tag
@@ -158,7 +155,7 @@ class ScoreCache:
     def _path(self, key: str) -> Path:
         return self.cache_dir / f"{key}.json"
 
-    def get(self, facet_id: str, turn: ConversationTurn) -> Optional[FacetScore]:
+    def get(self, facet_id: str, turn: ConversationTurn) -> FacetScore | None:
         p = self._path(self._key(facet_id, turn))
         if not p.exists():
             return None

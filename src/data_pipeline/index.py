@@ -48,7 +48,8 @@ def build_index(
     out_meta: Path,
     embedder_name: str,
 ) -> dict:
-    from src.utils.embeddings import build_embedder, build_index as build_vec_index, save_index
+    from src.utils.embeddings import build_embedder, save_index
+    from src.utils.embeddings import build_index as build_vec_index
 
     defs = _load_enriched(enriched_jsonl)
     log.info("Embedding %d facets with %s", len(defs), embedder_name)
