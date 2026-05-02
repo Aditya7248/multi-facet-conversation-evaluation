@@ -92,20 +92,35 @@ The cost driver is *facets scored per turn*, not *facets in the catalogue*. The 
 
 ## Quickstart — local
 
+This stack needs **four terminal tabs** running simultaneously: Ollama (the LLM server), the FastAPI backend, the Streamlit UI, and a free shell for one-off commands. Each `make` target stays in the foreground.
+
 ```bash
-# 1. Install
-make install                      # pip install -r requirements.txt
+# --- One-time setup -------------------------------------------------------
+# 1. Install Python deps
+make install                              # pip install -r requirements.txt
 
 # 2. Build the data artefacts (clean + enrich + FAISS index)
 make data-all
 
-# 3. Pull an open-weights model and start the API + UI
+# 3. Pull the open-weights model into Ollama (first run only, ~5 GB)
 ollama pull qwen3:8b
-make run-api                      # FastAPI on :8080
-make run-ui                       # Streamlit on :8501
+
+# --- Per-session runtime (each in its own terminal tab) -------------------
+# Tab A — Ollama LLM server. Leave running.
+OLLAMA_NUM_PARALLEL=4 OLLAMA_MAX_LOADED_MODELS=1 ollama serve
+
+# Tab B — FastAPI backend on :8080. Leave running.
+make run-api
+
+# Tab C — Streamlit UI on :8501. Leave running.
+make run-ui
 ```
 
 Open <http://localhost:8501>, paste a conversation, watch facets score live.
+
+> **Why three tabs?** Each service stays in the foreground so its logs are visible. `ollama serve` *must* be running before `make run-api` — without it, the API falls back to the keyword-matching `HeuristicClient` (still functional for tests, but not what you want to actually score with). The `OLLAMA_NUM_PARALLEL=4` lets Ollama time-slice the GPU across 4 concurrent requests for ~2-3× faster batch scoring on Apple Silicon.
+
+To shut down, press `Ctrl+C` in each tab (or just close them).
 
 ## Quickstart — Docker
 
@@ -149,7 +164,7 @@ If none of the above is reachable, the system falls back to a `HeuristicClient` 
 ## Repository layout
 
 ```
-ocean-across-eval/
+multi-facet-conversation-evaluation/
 ├── configs/config.yaml            # all knobs — paths, top_k, parallelism, scale
 ├── src/
 │   ├── data_pipeline/
